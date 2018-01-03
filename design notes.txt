@@ -1,0 +1,89 @@
+##########################################Neutral creatures############################################################
+-Forest
+    -Mendr - A small, yellow, scaly, flying organism. It is carbon based. "m" (muted yellow)
+    -Cren - A small, black, feathered, flying organism. It is carbon based, but does seem to have been genetically modified. "c" (dark blue-grey)
+    -M'lo - A medium-sized, black, scaly, flying organism. A species introduced by the Gekrian in their colonization of this planet. It is carbon based and has been through extensive genetic modification to live on this planet. "m" (dark green)
+
+-Ice Caverns
+    -Ik'na - A small, brown, furry quadroped. Adapted to live in harsh conditions, one can only wonder why it was brought here. It is carbon based. "i" (brown)
+    
+-Temple
+    -F'n - A brown, six legged critter. It's generally harmless. It is carbon based. "f" (light brown)
+
+################################################Enemies################################################################
+-Forest
+    -A'nl - A medium-sized, light green, scaly, bipedal organism, with no arms. Easy to take down, only dangerous in groups. It is carbon based. "A" (light green)
+    -N'i - A large, dark green, hairless, quadroped organism. Very fast in movement and will kill those who don't take immediate action. It is silicon based. "N" (dark green)
+    -F'dr - A gigantic, multi-colored, feathered, octoped organism. This bastard will kill a whole entire squadron in no time flat. A Gekrian genetic experiment from the era of the slave revolts. "F" (Boss) (randomized)
+
+-Ice Caverns
+    -T'lon - A large, blue and brown striped, furry, bipedal organism, with two arms. This creature was supposedly a folk legend of the Vendrezi species, the first to be enslaved by the Gekrian, and the first to revolt against the Gekrian. It was originally meant to instill fear into children who would misbehave. It is carbon based. "T" (blue then brown)
+    -Nee'vr - A medium-sized, black, green, & blue striped, scaly, flying quadroped. Another creature of a folk tale, this time used by the Gekrian to terrorize the Vendrezi. It is carbon based. "N" (aqua)
+    -Ich'ka - A crystalline being. A creature sent by the 'Vir", a species from another dimension. "I" (Boss) (light blue)
+
+-Temple
+    -A'ten - A machine from a long time ago. The Gekrian built these to protect holy sites of their god `G'fen`. Made of unknown alloys. "T" (metallic brown)
+    -Socra - A creature sent by the Vir. "C" (green)
+    -W'tek - An aquatic based lifeform. A genetic experiment of the Vir. "W" (boss) (light blue)
+
+-Power Plant
+    -Six Tailed Firewalker - A six tailed creature, with a fireball at the end of each tail. It is a genetic experiment of the Vir. "S" (boss) (red)
+    -Z'ken - A bipedal flying creature with large leathery wings. A war creature of the Vir. "Z" (White)
+    -M'gdn - A gigantic quadroped herbivore. It's leathery skin is stretched over incredibly dense bones. It is a highly territorial creature. It is carbon based. "M" (brown)
+
+########################################################Books##############################################################
+-Only available in the temple
+-Gives lore
+-Increases XP
+-uses definitions files
+
+######################################################Rendering############################################################
+-Render Map to memory first
+-Draw black over areas that are past the player's l-o-s
+-Only 'Dynamic' objects are rendered in 'real' time (render pipeline: Map -> Objects -> Entities)
+-Entities can only see each other either by use of sonar or within their l-o-s
+-Everything is a 'string', so call draw-string to draw whatever at the x and y position (modified by kerning)
+-Check on difficulty of coloring a string (shouldn't be too hard)
+
+#####################################################Movement#############################################################
+-Entities have a position attribute (accessed by (entity-position entity)) which is structured like so: '((:x x) (:y y))
+-Access to x and y: (cadr (assoc :x (entity-position entity))) (cadr (assoc :y (entity-position entity)))
+-directions:
+		405
+		3P1
+		726
+-
+
+#######################################################GUI###############################################################
+
+##########################################
+#Action	|.......................#HP/MHP	 #
+#list	|.....www...w...........#MP/MMP  #
+#	|.......wwwww...ww......#	 #
+#weap	|....wwwww..wwww..w.....#XP	 #
+#armo	|.....www....wwwwww.....#LVL	 #
+#	|..`.BB.www.wwwwww......#	 #
+#atfeet	|.`-O-;ww.www..ww.......#	 #
+#	|...;...wwwwwwww........#--------#
+#tiletyp|....... ww.w.w.........#VisEnemy#
+#	|.......@...............#	 #
+#	|######...###...###...I.#	 #
+#-------|-----------------------#--------#
+#Cursor	|Messages		#Level	 #
+#info	|			#Floor	 #
+##########################################
+
+
+
+ARRAYS
+-Map array (for the terrain)
+-item array (for the items (aref item-array (or cursor-y player-y)  (or cursor-x player-x))
+-enemy array (for the enemies (aref enemy-array cursor-y  cursor-x))
+
+X/Y-offset
+(when player-x < (/ max-characters 2)
+      (+ menu-x (p-x * (size-x character)))
+      player-x > (/ max-characters 2) and < (- array-y-dim (/ mc 2))
+      (/ (menu-width) 2)
+      player x > (- array-y-dim (/ mc 2))
+      

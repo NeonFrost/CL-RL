@@ -1,0 +1,10 @@
+To draw strings on a constant centered basis: (idea)
+   divide screen width by 2
+   get the length of the string
+   Mult length by font width
+   take away the product from the quotient
+   (- (/ w 2) (* (length string) font-width))
+
+Examples:
+			Ding dong the witch is dead
+			       Duodongo dies

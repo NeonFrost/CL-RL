@@ -1,0 +1,109 @@
+Engine note:
+Files ending with ".{def}" must be read in a certain way
+Files with ".creature" must be organized like so
+
+NAME
+DESCRIPTION
+STATS (A;D;R;MA;MD;DG;HP;MP;XP;L;E;SYM;LOS)
+
+example:
+Socra
+"A small odd creature. It has pincers and can spit acid. A creature of the Vir."
+A: 5; D: 2; R: 5; MA: 1; MD: 3; S: 5; DG: 5%; HP: 12; MP: 3; XP: 30; L: 5; E: Vir; SYM: S; LOS: 5
+
+".class" files like so
+
+NAME
+ABILITIES
+ATTRIBUTE MODIFIERS
+RESISTANT
+WEAKNESSES
+
+example:
+Welder
+Weld; Torch; Arson
+A: +2; D: +5; M: -50%; S: -1
+Fire
+Water
+
+".dead"
+
+NAME
+LEVEL
+ATTRIBUTES
+KILLS
+AREA - FLOOR/ROOM
+KILLED BY
+
+example:
+Viktor
+10
+A: 10; D: 20; RA: 20; MA: 40; MD: 20; M: 20%; S: 2; MHP: 600; MMP: 50
+128
+Temple - 6
+Socra
+
+".item"
+
+NAME
+TARGET
+CLASS
+RESTORE
+COST
+WEIGHT
+INFORMATION
+SYMBOL
+
+ex:
+"Pack of batteries"
+'self
+'energy
+10
+1
+"A pack of batteries, meant to act as a storage container for electricity generation on a small scale."
+5
+
+".weapon"
+
+NAME
+CLASS
+ATTACK
+DEFENSE
+AGILITY
+RESTORE
+COST
+WEIGHT
+INFORMATION
+SYMBOL
+
+ex:
+"Carbon axe"
+:axe
+5
+2
+-1
+0
+40
+15
+"An axe made of a carbon alloy."
+20
+
+".book"
+
+NAME
+CONTENTS
+XP-GIVEN
+
+Example:
+The Massacre of Vk'nef
+"When G'fen's punishment began, it was believed that the Vikshnar were involved in the creation and spread of the disease. 
+The Third Way of G'fen proceeded, on the mere basis of rumor, to attack the Vikshnar colony of Vk'nef.
+Upon discovery that these G'fen extremists were going to do this, the only thing the council could do was send a messenger to the Vikshnar homeworld.
+Our military arrived at Vk'nef half way through the massacre. Unfortunately, millions more died before the last of the murderers either fled or died.
+Many Vikshnars were killed that day, and many more were radicalized. Many Gekrian fear that the Vikshnar will initiate a military campaign against us.
+G'fen forgive us. We were but fools and murderers. We will be unable to atone for these sins.
+K'tenm gorl s'den vyek dan G'fen. (You are unable to translate this last sentence.)
+- Y'kne the architect of compassion"
+30
+
+

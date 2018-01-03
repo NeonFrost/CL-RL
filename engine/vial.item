@@ -1,0 +1,8 @@
+"Vial of Gon Blood"
+'self
+'healing
+40 ;restore
+0 ;cost
+.1 ;weight
+"A vial of refined gon blood. It causes cells to rapidly divide, healing any wounds, even the most serious of wounds, the drinker has sustained. It's use is limited due to the fact that it rapidly degenerates telomeres, which has been found to cause rapid aging."
+21 ;symbol number or "symbol"

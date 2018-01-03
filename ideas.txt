@@ -1,0 +1,118 @@
+################################################
+	No more strings, use a tilesheet
+################################################
+
+Smaller rouge-like first
+Consists of 3-5 'levels'
+10 floors/rooms each, 10th floor/room of each being the boss
+Sci-fi, takes place in Karakas/Enigma universe
+
+Levels
+-Forest - Neutral creatures (bugs, rodents, etc.)
+-Ice Caverns - Ice creatures
+-Temple - Machines
+-Thermal Energy Plant - Fire Creatures, temperature resistant machines
+
+Features
+-Has a bit of difficulty, but is meant to be an 'introduction' to rogue-likes, so it's not 'rogue' hard, so to speak
+-'Full' Screen pseudo-ASCII gfx, that is, a 1360x720 window will be filled mostly with the map and a bit of the 'UI' (messages, stats, enemy-list, etc)
+-Short
+
+Version goals
+0.1 Window running, single room mapped out, character can walk around
+0.2 UI Framework, map generation started, equip and unequip items, use items, begin adding creatures, start combat system
+0.25 Finish parsers
+0.3 map generation modified to accomodate different layouts, finish 'items', begin adding weapons & armor
+0.4 Finish ranged combat
+0.5 Begin music system
+0.6 finish addding creatures
+0.65 Rebalance creatures and weapons
+0.7 Finish music system
+0.8 Finish hand-to-hand combat
+0.9 finish status effects & modifications
+0.99 Bug hunting
+1.0 Finished, move on
+
+
+
+
+Randomly generated maps, except for certain places (main hub town, allied towns etc.)
+In the vein of dwarf fortress, angband, and dungeon crawl stone soup (ASCII-based, but can be modified to have 'graphics'. Uses SDL2 and SDL2-ttf.)
+Takes place in the future, large scale revolt, have to destroy genetic experiments between towns to clear a path for revolutionary troops to progress.
+Eventually have to fight within large cities against national armies and participate in assassinations (meaning you need to disarm yourself except for a small weapon, like a dagger)
+
+Version goals
+0.1: Player can move around, 4 enemy types, 1 town mapped out, 5 levels (hand crafted) can be accessed
+0.2: Player can equip items, use items, 6 enemy types, 2 towns mapped out, random area generator functioning
+0.5: All ranged weapons (for the time being) are in the game, starting hand to hand combat, improve enemy ai + pathseeking
+0.6: Improved level generation
+0.7: Hammer down story details, allow intercity travel
+0.8: Implement vehicles
+0.9: All weapons finished, hammer down area generator engine
+0.99: ''Faction'' system implemented
+1.0: Single Planet, single continent
+1.5: Assassinations implemented
+1.9: Finish implementing vehicles
+1.99: Bug tracking & fixing
+2.0: Single Planet, entire world
+2.01: start implementing Space vehicles
+2.5: Terrorist attacks implemented
+3.0: Inter-planetary, including space stations, single system
+3.9: Finish Space Vehicles
+4.0: Inter-stellar, uses a 'gate' system
+5.0: Have an absolute end goal implemented and an endstate (that doesn't actually end the game. The story then becomes "Track down the last of the old world")
+
+
+
+Features
+''Factions''
+-Origin story for character (baker from La'torn, career soldier from Ferl, janitor from Lektown, programmer of Heym, councilman of F'ko)
+-Has no impact on the actual gameplay and story aside from "Ferdinand, a cashier turned revolutionary from F'ko, helped to liberate many many people across many many systems"
+Combat:
+-Ranged weapons
+    -Guns
+    -Ballistas (stationary)
+    -Catapults (stationary)
+    -Crossbows
+    -Bows
+-Hand to Hand
+    -Swords
+    -Fisticuff
+    -Bayonettes
+-Vehicle
+    -Auto move per turn
+    -Takes 1 - 3 turns to switch from 'vehicle' to 'character' combat (i.e. tank gun to crossbow)
+    -Vehicles
+	-Land Vehicles
+	    -Tanks (powerful, can only hold 4 'drivers' and 2 prisoners
+	    -Cars (fast, but can't carry much)
+	    -Trucks (slow, but can carry a lot)
+	-Water Vehicles (ranked)
+	-Aerial vehicles
+	   -Helicopter (carries large amounts of ammo, can only carry up to 8 passengers)
+	   -Airplane (Has machine guns attached, not much in the way of armor, carries large amounts of fuel)
+	   -Hanglider (Temporarily in the air, pistols and crossbows can be used)
+
+	-Space Vehicles
+	   -Fighter (small amounts of armor, small cargo space, fast)
+	   -Miner (large amounts of armor, large cargo space, slow)
+	   -Transport (small armor, large cargo, fast)
+	   -Forward ship (med arm, med cargo, med)
+	   -Dreadnought (XL arm, XL cargo, med)
+	   -Carrier (XXXL arm, XXXL cargo, very very slow (takes 5* as many turns to move as the destroyer))
+	 ---------------------------------------------------------------------
+	   -Destroyer (XL arm, XL cargo, slow, can't pass through gates)
+Movment:
+-Walking
+-Running
+-Vehicle
+-Grappling/hookshots
+HP restrictions
+-No food system
+Persistent systems
+-World generation
+-System generation
+
+Story advancement
+-Must go through each mode (Single continent, world, single system, multi-system) to unlock the next mode
+-Start back at the beginning of each mode upon death, origin ''faction'' is destroyed, requiring a new ''faction'' is chosen
