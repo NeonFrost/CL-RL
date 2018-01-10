@@ -1,6 +1,6 @@
 #|
 starting sequence
-(ql:quickload :sdl2) (ql:quickload :sdl2-mixer) (ql:quickload :sdl2-image) (load "Main.lisp") (main)
+(ql:quickload :sdl2) (ql:quickload :sdl2-image) (ql:quickload :sdl2-mixer) (load "Main.lisp") (main)
 |#
 ;;;;TYPE C-c C-c to send an //slime interrupt// to sbcl, so that it will evaluate whatever code you wrote
 (defvar screen-surface nil)
@@ -21,7 +21,7 @@ starting sequence
   "Stolen from 3bb.cc"
   `(restart-case
     (progn ,@body)
-    (continue () :report "Countinue" )))
+    (continue () :report "Continue")))
 
 (defun init-engine ()
   (load "engine.cl")
@@ -36,13 +36,10 @@ starting sequence
 			      :flags '(:shown))
       (sdl2:with-renderer (default-renderer window)
 ;;;;	(sdl2-image:init '(:png))
-;;;;	(sdl2-ttf:init)
 	(sdl2-mixer:init :ogg)
 	(sdl2-mixer:open-audio 44100 :s16sys 2 1024)
 	(setf renderer (sdl2:get-renderer window))
-;;;;	(setf *font* (sdl2-ttf:open-font "Test.ttf" 16))
-	(init-engine) ;start sdl-mixer somewhere
-	(start-main-menu-music (track-path level-track))
+	(init-engine)
 	(sdl2:with-event-loop (:method :poll)
 	  (:keydown (:keysym keysym)
 		    (keydown-check (sdl2:scancode keysym))
@@ -51,9 +48,11 @@ starting sequence
 		  (keyup-check (sdl2:scancode keysym))
 		  )
 	  (:idle ()
+		 (la-loop))
+		 #|()
 		 #+(and sbcl (not sb-thread)) (restartable (sb-sys:serve-all-events 0))
 		 (restartable (la-loop))
-		 )
+		 )|#
 	  (:quit ()
 		 ;;;;(close-font)
 		 (quit-audio)
@@ -70,6 +69,7 @@ starting sequence
   )
 
 (defun game-loop ()
+  (test-music)
   (case state ;state management
     (title (title-loop))
     (level (level-loop))
@@ -100,4 +100,8 @@ starting sequence
   (if +font-sheet+
       (progn (sdl2:free-surface +font-sheet+)
 	     (setf +font-sheet+ nil)))
+  )
+
+(defun create-exec ()
+  (sb-ext:save-lisp-and-die "main" :toplevel #'main :executable t)
   )

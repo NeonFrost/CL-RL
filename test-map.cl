@@ -1,3 +1,12 @@
+(define-level forest :name "Forest"
+	      :type 'dungeon
+	      :music "engine/audio/Forest.ogg")
+(setf (player-level user) forest)
+(start-level-music (level-music (player-level user)))
+(define-level temple :name "Gekrian Temple"
+	      :type 'dungeon
+	      :music "engine/audio/Temple.ogg")
+
 (setf main-map (make-array '(100 100) :initial-element "."))
 (setf item-array (make-array '(100 100)))
 (setf enemy-array (make-array '(100 100)))

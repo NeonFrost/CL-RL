@@ -46,6 +46,11 @@ File for the 'entity' structures
   (symbol-color +white+)
   )
 
+(defmacro entity-x (entity)
+  `(cadr (assoc :x (entity-position ,entity))))
+(defmacro entity-y (entity)
+  `(cadr (assoc :y (entity-position ,entity))))
+
 (defstruct (creature (:include entity (elemental 'creature) (symbol "c") (weapon 'claws)))
   (tasks '(move))
   (stance 'neutral)
@@ -57,6 +62,8 @@ File for the 'entity' structures
   (max-energy 10)
   ranged-weapon
   )
+
+(defvar user (make-player))
 
 (defvar player (make-player-character :position '((:x 35) (:y 35)) :bg-color +navy-blue+ :symbol-color +yellow-zinc+))
 (setf (cursor-x cursor) (cadr (assoc :x (entity-position player)))

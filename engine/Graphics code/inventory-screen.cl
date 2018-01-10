@@ -3,9 +3,9 @@
 (defvar inventory-state 'items)
 (defvar players-inventory nil)
 
-(defpotion potion-of-curing "Potion of Curing" 'single 'heal-hp 20 0)
-(defpotion potion-of-health "Potion of Health" 'single 'heal-hp 50 0)
-(defpotion cure-all "Cure all" 'single 'heal-hp-remove-effects 100 0)
+(defpotion potion-of-curing "Potion of Curing" :target 'single :class 'heal-hp :restore 20 :cost 0)
+(defpotion potion-of-health "Potion of Health" :target 'single :class 'heal-hp :restore 50 :cost 0)
+(defpotion cure-all "Cure all" :target 'single :class 'heal-hp-remove-effects :restore 100 :cost 0)
 (defarmor leather-cuirass "Leather Cuirass" 0 5 1 200 'warrior :symbol 21 :information "A Cuirass made from chipmunk leather.
 A rather...unique item.")
 (defhammer silver-hammer "Silver War Hammer" 20 5 600)

@@ -91,20 +91,20 @@
   (magic (restore-magic target item))
   (heal-magic (restore-health target item)
   (restore-magic target item))
-  (revive (revive-mage target item))
+  (revive (revive-entity target item))
   ))|#
   (subtract-item item)
   )
 
-(defmacro heal-hp (mage amt)
-  `(incf (mage-hp ,mage) ,amt))
-(defmacro heal-mp (mage amt)
-  `(incf (mage-mp ,mage) ,amt))
+(defmacro heal-hp (entity amt)
+  `(incf (entity-hp ,entity) ,amt))
+(defmacro heal-mp (entity amt)
+  `(incf (entity-mp ,entity) ,amt))
 
 (defun heal-party ()
   (loop for m in party
-     do (heal-hp m (mage-max-hp m))
-       (heal-mp m (mage-max-mp m))
+     do (heal-hp m (entity-max-hp m))
+       (heal-mp m (entity-max-mp m))
        ))
 #|
 (defun add-to-inventory (item)

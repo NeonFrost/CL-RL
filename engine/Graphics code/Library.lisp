@@ -1,4 +1,38 @@
-(defstruct chest
+(defstruct level
+  name
+  type 
+  music
+;;;;Not in use with 'non-graphical' rogue-likes  sheet ;A path
+  (battle-chance 0)
+  monster-list
+;;;;  world-xy
+  sheet-surface
+  (rooms (make-hash-table)))
+
+(defstruct area
+  name
+  array
+  texture
+  transitions
+;;;;  chests
+;;;;  shop
+  connected-areas
+  connected-level 
+  spring)
+
+(defmacro define-level (var &key (name "Level") (type 'dungeon) (music "default-song.ogg") (battle-chance 0) (monster-list nil))
+  (let ((type (write-to-string type)))
+    `(defvar ,var (make-level :name ,name :type (intern ,type) :music ,music :battle-chance ,battle-chance :monster-list ,monster-list))
+    ))
+
+(defmacro define-area (hash-symbol level &key (name "Area") (array (make-array '(10 10))) (transitions (list 0 0)) (connected-areas nil) (connected-level nil) (spring (list 5 5)))
+  (let ((area (make-area :name name :array array
+			 :transitions transitions :spring spring
+			 :connected-areas connected-areas
+			 :connected-level connected-level)))
+  `(setf (gethash ,hash-symbol (level-rooms ,level)) ,area)))
+								
+#|(defstruct chest
   x
   y
   cell
@@ -11,7 +45,7 @@
 	     (append (list (make-chest :x ,x :y ,y :cell ,cell :contents (list ,contents)) (area-chests (gethash ,area (level-areas ,level))))))
        (setf (area-chests (gethash ,area (level-areas ,level)))
 	     (list (make-chest :x ,x :y ,y :cell ,cell :contents (list ,contents))))
-       ))
+       ))|#
 #|
 ======================================================================
                              INVENTORY
@@ -22,12 +56,14 @@
 (defstruct inventory
   weapons
   armor
-  items)
+  items
+  weight
+  max-weight)
 
 (defun ascii-to-string (code)
-  (if (integerp code)
+ (if (integerp code)
       (concatenate 'string "" (list (code-char code)))
-      (concatenate 'string "" code))
+      (concatenate 'string "" (string code)))
   )
 
 (defstruct item
@@ -52,8 +88,14 @@
   `(defstruct (,weapon (:include item (name ,name) (type 'weapon) (class ,class) (attack ,attack) (defense ,defense) (agility ,agility) (cost ,cost) (symbol (ascii-to-string ,symbol)) (information ,information)))))
 (defmacro defarmor (armor name attack defense agility cost class &key (symbol "[") (information ""))
   `(defstruct (,armor (:include item (name ,name) (type 'armor) (class ,class) (attack ,attack) (defense ,defense) (agility ,agility) (cost ,cost) (symbol (ascii-to-string ,symbol)) (information ,information)))))
-(defmacro defpotion (potion name target class restore cost)
-  `(defstruct (,potion (:include item (name ,name) (target ,target) (type 'item) (class ,class) (restore ,restore) (cost ,cost)))))
+
+(defmacro defpotion (potion name &key (target 'single) (class 'healing) (type 'potion) (restore 5) (cost 50))
+  (let ((type (write-to-string type))
+	(class (write-to-string class))
+	(target (write-to-string target)))
+    `(defstruct (,potion (:include item (name ,name) (target (intern ,target)) (type (intern ,type)) (class (intern ,class)) (restore ,restore) (cost ,cost))))
+    ))
+
 (defmacro defsword (sword name attack defense agility cost)
   `(defstruct (,sword (:include item (name ,name) (type 'weapon) (class 'earth) (attack ,attack) (defense ,defense) (agility ,agility) (cost ,cost)))))
 (defmacro defhammer (hammer name attack defense cost)
@@ -105,8 +147,8 @@
   (effect 'attack))
 
 (defmacro defspell (var spell-name cost element lvl-req &key (target 'single) (effect 'attack) (spell-lvl 1))
-  (let ((eff (string effect))
-	(tar (string target)))
+  (let ((eff (write-to-string effect))
+	(tar (write-to-string target)))
   `(progn (defparameter ,var (make-spell :name ,spell-name :cost ,cost :target (intern ,tar) :effect (intern ,eff) :level ,spell-lvl))
 	  (setf (gethash ,lvl-req (gethash ,element *legal-spells*)) ,var))
   ))
@@ -153,7 +195,6 @@ Now for some 'helper' functions
 
 (defmacro optimize-sheet (var)
   `(setf (sprite-sheet-texture ,var) (sdl2:create-texture-from-surface renderer (sprite-sheet-surface ,var)))
-;;;;	  (sdl2:free-surface (sprite-sheet-surface ,var))
   )
 
 (defmacro set-sheet-width (sheet width)
@@ -240,55 +281,6 @@ Now for some 'helper' functions
      (sdl2:free-rect rect)
      ))
 
-#|(defun render-string (str x y &key (*string-color* '(255 255 255 255)) to-texture)
-;;;;  `(sdl:draw-string-at-* ,str ,x ,y))
-  `(let* (#|(*font-color* (if (not ,*string-color*)
-			    '(255 255 255 0)
-			    ,*string-color*))
-|#
-	  (buffer (sdl2:create-rgb-surface (* (length str) (car character-size)) (cadr character-size) 32))
-	  (cell-row 0)
-	  (cell-column 0)
-	  (texture nil)
-	  )
-     (loop for n below (1- (length str))
-	do (setf (values cell-row cell-column) (truncate (char-code (aref string n)) 16))
-	  (render-character-to-buffer (list cell-row cell-column)
-				      (+ x (* n (car character-size)))
-				      y
-				      buffer)
-	  )
-     (if to-texture
-	 (progn (setf texture (sdl2:create-texture-from-surface renderer buffer))
-		(sdl2:free-surface buffer)
-		texture)
-	#|	(sdl2:render-copy renderer
-				  texture
-				  :source-rect (cffi:null-pointer)
-				  :dest-rect (sdl2:make-rect (+ ,x 4) ,y
-							     (sdl2:texture-width texture)
-							     (sdl2:texture-height texture)))
-		(sdl2:destroy-texture texture)|#
-	 )
-     ))
-(defmacro render-font-string (str x y &key *font-color* *bg-color*)
-;;;;  `(sdl:draw-string-at-* ,str ,x ,y))
-  `(let* ((*font-color* (if (not ,*font-color*)
-			    '(255 255 255 0)
-			    ,*font-color*))
-	  (surface (sdl2-ttf:render-text-solid *font* ,str (car *font-color*) (cadr *font-color*) (caddr *font-color*) 0))
-	  (texture (sdl2:create-texture-from-surface renderer surface)))
-     (render-box ,x ,y 16 16 ,*bg-color*)
-     (sdl2:free-surface surface)
-     (sdl2:render-copy renderer
-		       texture
-		       :source-rect (cffi:null-pointer)
-		       :dest-rect (sdl2:make-rect (+ ,x 4) ,y
-						  (sdl2:texture-width texture)
-						  (sdl2:texture-height texture)))
-     (sdl2:destroy-texture texture)
-     ))|#
-
 (defmacro blit (src-surface src-rect dest-surface dest-rect)
   `(sdl2:blit-surface ,src-surface ,src-rect ,dest-surface ,dest-rect)
   )
@@ -307,50 +299,21 @@ Now for some 'helper' functions
 	)
   (blit (sprite-sheet-surface sheet) src-rect surface dest-rect)
   ))
-#|
-(defmacro create-text-buffer (str x y &key to-texture)
-  `(let* ((buffer (sdl2:create-rgb-surface (* (length ,str) (car character-size)) (cadr character-size) 32))
-	  (cell-row 0)
-	  (cell-column 0)
-	  (texture nil)
-	  )
-     (loop for n below (1- (length ,str))
-	do (setf (values cell-row cell-column) (truncate (char-code (aref ,string n)) 16))
-	  (render-character-to-buffer (list cell-row cell-column)
-				      (+ ,x (* n (car character-size)))
-				      ,y
-				      buffer)
-	  )
-     (if to-texture
-	 (progn (setf texture (sdl2:create-texture-from-surface renderer buffer))
-		(sdl2:free-surface buffer)
-		texture)
-	 buffer)
-	#|	(sdl2:render-copy renderer
-				  texture
-				  :source-rect (cffi:null-pointer)
-				  :dest-rect (sdl2:make-rect (+ ,x 4) ,y
-							     (sdl2:texture-width texture)
-							     (sdl2:texture-height texture)))
-		(sdl2:destroy-texture texture)|#
-	 
-     ))
-|#
+
 (defmacro reset-text-buffer (buffer)
   `(if ,buffer
        (progn (sdl2:destroy-texture ,buffer)
 	      (setf ,buffer nil)))
   )
+
 (defun render-buffer (buffer menu &key color)
   (sdl2:set-texture-color-mod buffer (car color) (cadr color) (caddr color))
   (sdl2:render-copy renderer
 		    buffer
 		    :source-rect (sdl2:make-rect 0
 						 0
-						 (menu-width menu)
-						 (menu-height menu)
-#|						 (sdl2:texture-width buffer)
-						 (sdl2:texture-height buffer)|#
+						 (sdl2:texture-width buffer)
+						 (sdl2:texture-height buffer)
 						 )				    
 		    :dest-rect (sdl2:make-rect (+ (menu-x menu) 8)
 					       (+ (menu-y menu) 8)

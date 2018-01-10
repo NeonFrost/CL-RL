@@ -1,4 +1,3 @@
-(defvar current-item 0)
 (defvar old-sub-state 'top)
 (defvar moving nil)
 (defstruct modifier-states
@@ -15,6 +14,8 @@
   (case key
     ((or :scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) t))
     ((or :scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) t))
+    (:scancode-m (setf (player-level user) temple)
+		 (setf volume-state 'track-changing))
     )
   (case state
     (title (main-menu-keys-down key))
@@ -101,15 +102,6 @@
 	    (:scancode-down (setf moving 'south))
 	    (:scancode-escape (quit-game))
 	    (:scancode-l (setf sub-state 'look))
-#|			 (if (and shift-state
-				  (not control-state))
-			     (setf sub-state 'look)
-			     (if (and shift-state
-				      control-state)
-				 (setf moving 'north-west)
-				 (if (and (not shift-state)
-					  control-state)
-				     (setf state 'inventory)))))|#
 	    ))
     ((or look target) (case key
 			(:scancode-e (if (not (eq (aref enemy-array (cursor-y cursor) (cursor-x cursor)) 0))
@@ -196,22 +188,33 @@
 
 
 (defun inventory-keys-down (key)
-  (let ((inventory-length (case inventory-state
+  (let ((current-item selection)
+	(inventory-length (case inventory-state
 			    (items (1- (length (inventory-items players-inventory))))
 			    (armor (1- (length (inventory-armor players-inventory))))
 			    (weapons (1- (length (inventory-weapons players-inventory)))))))
     (case key
       (:scancode-up (change-selection 0 :max-length inventory-length))
       (:scancode-down (change-selection 1 :max-length inventory-length))
-      (:scancode-1 (setf inventory-state 'items)
-		   (setf selection 0)
-		   (reset-text-buffer inventory-buffer))
-      (:scancode-2 (setf inventory-state 'armor)
-		   (setf selection 0)
-		   (reset-text-buffer inventory-buffer))
-      (:scancode-3 (setf inventory-state 'weapons)
-		   (setf selection 0)
-		   (reset-text-buffer inventory-buffer))
+      (:scancode-1 (case sub-state
+		     (top (setf inventory-state 'items)
+			  (setf selection 0)
+			  (reset-text-buffer inventory-buffer))))
+      (:scancode-2 (case sub-state
+		     (top (setf inventory-state 'armor)
+			  (setf selection 0)
+			  (reset-text-buffer inventory-buffer))))
+      (:scancode-3 (case sub-state
+		     (top (setf inventory-state 'weapons)
+			  (setf selection 0)
+			  (reset-text-buffer inventory-buffer))))
+      (:scancode-e (if (eq sub-state 'item-information)
+		       (if (eq inventory-state armor)
+			   ;;;;equip armor onto the player
+			   )
+		       (if (eq inventory-state weapons)
+			   ;;;equip weapon onto player
+			   )))
       (:scancode-x (if (not (eq sub-state 'top))
 		       (progn (setf sub-state old-sub-state)
 			      (setf old-sub-state 'top)
