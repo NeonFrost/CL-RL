@@ -3,6 +3,8 @@ starting sequence
 (ql:quickload :sdl2) (ql:quickload :sdl2-image) (ql:quickload :sdl2-mixer) (load "Main.lisp") (main)
 |#
 ;;;;TYPE C-c C-c to send an //slime interrupt// to sbcl, so that it will evaluate whatever code you wrote
+(proclaim '(optimize (speed 3) (debug 0)))
+
 (defvar screen-surface nil)
 (defvar *screen-width* 1680)
 (defvar *screen-height* 1050)
@@ -34,7 +36,7 @@ starting sequence
 			      :w *screen-width*
 			      :h *screen-height*
 			      :flags '(:shown))
-      (sdl2:with-renderer (default-renderer window)
+      (sdl2:with-renderer (default-renderer window :flags '(:renderer-accelerated))
 ;;;;	(sdl2-image:init '(:png))
 	(sdl2-mixer:init :ogg)
 	(sdl2-mixer:open-audio 44100 :s16sys 2 1024)
@@ -48,11 +50,10 @@ starting sequence
 		  (keyup-check (sdl2:scancode keysym))
 		  )
 	  (:idle ()
-		 (la-loop))
-		 #|()
-		 #+(and sbcl (not sb-thread)) (restartable (sb-sys:serve-all-events 0))
-		 (restartable (la-loop))
-		 )|#
+		 (la-loop)
+#|		 #+(and sbcl (not sb-thread)) (restartable (sb-sys:serve-all-events 0))
+		 (restartable (la-loop))|#
+		 )
 	  (:quit ()
 		 ;;;;(close-font)
 		 (quit-audio)
@@ -66,19 +67,30 @@ starting sequence
   (game-loop)
   (sdl2:render-present renderer)
   (sdl2:delay 30)
+  (gc :full t)
   )
 
 (defun game-loop ()
   (test-music)
-  (case state ;state management
+  (case state
     (title (title-loop))
     (level (level-loop))
     (paused (paused-loop))
     (inventory (inventory-loop))
     (credits (credits-loop))
     (game-over (game-over-loop))
-    )
-  )
+    ))
+
+#|(defun g-loop ()
+  (case state
+    (title (title-loop))
+    (level (level-loop))
+    (paused (paused-loop))
+    (inventory (inventory-loop))
+    (credits (credits-loop))
+    (game-over (game-over-loop))
+    ))
+|#
 
 (defun kill-textures ()
   (if player-buffer

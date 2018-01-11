@@ -31,8 +31,11 @@
        (if (player-character-p entity)
 	   (reset-messages))
        ,@body
-       (create-message)
-       (reset-text-buffer enemy-buffer)
+       (if (and messages
+		(not (string= messages "")))
+	   (create-message))
+       (if (not (player-character-p entity))
+	   (reset-text-buffer enemy-buffer))
        (if ends-turn
 	   (end-turn))
        )))
@@ -105,9 +108,10 @@
 	  (if (eq (entity-current-action entity) 'defend)
 	      (setf (entity-defense-mod entity) 0))
 	  (if (not (or (eq dir 5) (eq dir 'p) (eq dir 'player)))
-	      (push-message (concatenate 'string "You fire " (item-name (player-charcter-ranged-weapon entity)) " to the " (write-to-string dir) "."))
+	      (progn (push-message (concatenate 'string "You fire " (item-name (player-charcter-ranged-weapon entity)) " to the " (write-to-string dir) "."))
+;;;;		     (test-ranged-attack player :target-point (list (cursor-x cursor) (cursor-y)))
+		     )
 	      (push-message "This isn't Full Metal Jacket."))
-	  (test-ranged-attack player :target-point (list (cursor-x cursor) (cursor-y)))
 	  ))))
 
 

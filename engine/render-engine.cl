@@ -41,20 +41,24 @@
 	  (setf str (set-status-string))
 	  (setf status-buffer (create-text-buffer str 0 0 :width (+ width (* (car character-size) 2)) :height (+ (cadr character-size) height) :to-texture t :string-case 'text))
 	  ))
-    (sdl2:render-copy renderer
-		      status-buffer
-		      :source-rect (sdl2:make-rect 0
-						   0
-						   (sdl2:texture-width status-buffer) 
-						   (sdl2:texture-height status-buffer))
-		      :dest-rect (sdl2:make-rect (+ x (/ (car character-size) 2))
-						 (+ y (/ (cadr character-size) 2))
-						 width (- height 16))
-		      )))
+    (let ((src (sdl2:make-rect 0 0
+			       (sdl2:texture-width status-buffer) 
+			       (sdl2:texture-height status-buffer)))
+	  (dest (sdl2:make-rect (+ x (/ (car character-size) 2))
+				(+ y (/ (cadr character-size) 2))
+				width (- height 16))))	  
+      (sdl2:render-copy renderer
+			status-buffer
+			:source-rect src
+			:dest-rect dest
+			)
+      (sdl2:free-rect src)
+      (sdl2:free-rect dest)
+      )))
 
 (defun render-item-information ()
   (if (and (eq inventory-state 'items)
-	   (eq (item-class (nth selection (inventory-items players-inventory)) 'book)))
+	   (eq (item-class (nth selection (inventory-items players-inventory))) 'book))
       (render-book (nth selection (inventory-items players-inventory)))
       (progn (item-screen)
 	     (let* ((item (case inventory-state
@@ -64,19 +68,21 @@
 		    (info (item-information item))
 		    (name (item-name item)))
 	       (if (not information-buffer)
-		   (setf information-buffer (create-text-buffer (start-string name "" info)  0 0
+		   (setf information-buffer (create-text-buffer (start-string name "" info) 0 0
 								:width (menu-width information-menu)
 								:height (menu-height information-menu)
 								:to-texture t :string-case 'text)))
 	       (if information-buffer
-		   (tex-blit information-buffer
-			     :src (sdl2:make-rect 0 0
-						  (sdl2:texture-width information-buffer)
-						  (sdl2:texture-height information-buffer))
-			     :dest (sdl2:make-rect (+ (menu-x information-menu) (/ (car character-size) 2))
-						   (+ (menu-y information-menu) (/ (cadr character-size) 2))
-						   (- (menu-width information-menu) (/ (car character-size) 2))
-						   (- (menu-height information-menu) (/ (cadr character-size) 2)))
+		   (let ((src (sdl2:make-rect 0 0
+					      (sdl2:texture-width information-buffer)
+					      (sdl2:texture-height information-buffer)))
+			 (dest (sdl2:make-rect (+ (menu-x information-menu) (/ (car character-size) 2))
+					       (+ (menu-y information-menu) (/ (cadr character-size) 2))
+					       (- (menu-width information-menu) (/ (car character-size) 2))
+					       (- (menu-height information-menu) (/ (cadr character-size) 2)))))
+			  (tex-blit information-buffer
+				    :src src
+				    :dest dest)
 			     ))
 	       )
 	     )))
@@ -111,6 +117,7 @@
 
 (defun render-message ()
   (tex-blit message-buffer
+	    :src (sdl2:make-rect 0 0 (sdl2:texture-width message-buffer) (sdl2:texture-height message-buffer))
 	    :dest (sdl2:make-rect (menu-x message-menu)
 				  (menu-y message-menu)
 				  (menu-width message-menu)
@@ -197,30 +204,31 @@
 		     (* (- (cadr (assoc :y (entity-position player))) (/ (cadr max-characters) 2)) (cadr character-size))
 		     ))))
       (render-map x y max-characters)
-      (sdl2:render-copy renderer
-			item-buffer
-			:source-rect (sdl2:make-rect x
-						     y
-						     (* (car max-characters) (car character-size))
-						     (* (cadr max-characters) (cadr character-size))
-						     )				    
-			:dest-rect (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
-						   (+ (menu-y map-menu) (/ (cadr character-size) 2))
-						   (- (menu-width map-menu) (/ (car character-size) 2))
-						   (- (menu-height map-menu) (/ (cadr character-size) 2)))
-			)
-      (sdl2:render-copy renderer
-			enemy-buffer
-			:source-rect (sdl2:make-rect x
-						     y
-						     (* (car max-characters) (car character-size))
-						     (* (cadr max-characters) (cadr character-size))
-						     )				    
-			:dest-rect (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
-						   (+ (menu-y map-menu) (/ (cadr character-size) 2))
-						   (- (menu-width map-menu) (/ (car character-size) 2))
-						   (- (menu-height map-menu) (/ (cadr character-size) 2)))
-			)
+      (tex-blit item-buffer
+		#|(sdl2:render-copy renderer
+		item-buffer|#
+		:src (sdl2:make-rect x
+					     y
+					     (* (car max-characters) (car character-size))
+					     (* (cadr max-characters) (cadr character-size))
+					     )				    
+		:dest (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
+					   (+ (menu-y map-menu) (/ (cadr character-size) 2))
+					   (- (menu-width map-menu) (/ (car character-size) 2))
+					   (- (menu-height map-menu) (/ (cadr character-size) 2)))
+		)
+      (tex-blit enemy-buffer
+#|		(sdl2:render-copy renderer
+			enemy-buffer|#
+		:src (sdl2:make-rect x
+					     y
+					     (* (car max-characters) (car character-size))
+					     (* (cadr max-characters) (cadr character-size)))				    
+		:dest (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
+					   (+ (menu-y map-menu) (/ (cadr character-size) 2))
+					   (- (menu-width map-menu) (/ (car character-size) 2))
+					   (- (menu-height map-menu) (/ (cadr character-size) 2)))
+		)
       )
     (let ((x (if (< (cadr (assoc :x (entity-position player))) (/ (car max-characters) 2))
 		 (+ (menu-x map-menu) (* (cadr (assoc :x (entity-position player))) x-offset))
@@ -262,18 +270,18 @@
 		  x-offset
 		  y-offset
 		  :color (entity-bg-color player))
-      (sdl2:render-copy renderer
-			player-buffer
-			:source-rect (sdl2:make-rect 0 0
-						     (car character-size) (cadr character-size))
-			:dest-rect (sdl2:make-rect (+ x (round (/ x-offset 4)))
+      (tex-blit ;;;;(sdl2:render-copy renderer
+       player-buffer
+       :src (sdl2:make-rect 0 0
+			    (car character-size) (cadr character-size))
+       :dest (sdl2:make-rect (+ x (round (/ x-offset 4)))
 						   ;;;;(+ (- (+ x (round (/ x-offset 2))) (round (/ x-offset 4)) 4) (round (/ (car character-size) 4)))
 ;;;;						   (+ (- (+ y (round (/ y-offset 2))) (round (/ y-offset 4)) 4) (round (/ (cadr character-size) 4)))
-						   (+ y (round (/ y-offset 5)))
-						   x-offset
-						   (1+ y-offset)
-						   )
-			)
+				  (+ y (round (/ y-offset 5)))
+				  x-offset
+				  (1+ y-offset)
+				  )
+       )
       (if (or (eq sub-state 'look)
 	      (eq sub-state 'target))
 	  (progn (if (< c-x 0)

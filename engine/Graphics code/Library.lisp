@@ -240,6 +240,8 @@ Now for some 'helper' functions
 			    ,tex
 			    :source-rect ,src
 			    :dest-rect ,dest)
+	  (sdl2:free-rect ,src)
+	  (sdl2:free-rect ,dest)
 	  ))
 
 (defmacro draw-cell (sheet cell x y &key color)
@@ -297,7 +299,9 @@ Now for some 'helper' functions
 				   tsx
 				   tsy))
 	)
-  (blit (sprite-sheet-surface sheet) src-rect surface dest-rect)
+    (blit (sprite-sheet-surface sheet) src-rect surface dest-rect)
+    (sdl2:free-rect src-rect)
+    (sdl2:free-rect dest-rect)
   ))
 
 (defmacro reset-text-buffer (buffer)
@@ -308,19 +312,23 @@ Now for some 'helper' functions
 
 (defun render-buffer (buffer menu &key color)
   (sdl2:set-texture-color-mod buffer (car color) (cadr color) (caddr color))
-  (sdl2:render-copy renderer
-		    buffer
-		    :source-rect (sdl2:make-rect 0
-						 0
-						 (sdl2:texture-width buffer)
-						 (sdl2:texture-height buffer)
-						 )				    
-		    :dest-rect (sdl2:make-rect (+ (menu-x menu) 8)
-					       (+ (menu-y menu) 8)
-					       (- (menu-width menu) 8)
-					       (- (menu-height menu) 8)
-					       ))
-  )
+  (let ((src (sdl2:make-rect 0
+			     0
+			     (sdl2:texture-width buffer)
+			     (sdl2:texture-height buffer)
+			     ))
+	(dest (sdl2:make-rect (+ (menu-x menu) 8)
+			      (+ (menu-y menu) 8)
+			      (- (menu-width menu) 8)
+			      (- (menu-height menu) 8)
+			      )))
+    (sdl2:render-copy renderer
+		      buffer
+		      :source-rect src				    
+		      :dest-rect dest
+		      )
+    (sdl2:free-rect src)
+    (sdl2:free-rect dest)))
 		      
 ;;;;Tile buffer is a texture, create-tile-buffer creates clipped surfaces and then 'renders' them to the texture, which is then used as a single image
 
@@ -348,6 +356,7 @@ Now for some 'helper' functions
 	 )
      (sdl2:set-render-draw-color screen-surface r g b a)
      (sdl2:render-fill-rect screen-surface rect)
+     (sdl2:free-rect rect)
 ;;;; (blit rect nil screen-surface nil)
      )
   )

@@ -46,6 +46,9 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
     (blit +font-sheet+ src-rect temporary-surface tmp-rect)
     (sdl2:set-color-mod temporary-surface (car color) (cadr color) (caddr color))
     (blit temporary-surface tmp-rect buffer dest-rect)
+    (sdl2:free-rect src-rect)
+    (sdl2:free-rect dest-rect)
+    (sdl2:free-rect tmp-rect)
     )
   )
 

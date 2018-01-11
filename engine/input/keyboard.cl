@@ -80,7 +80,7 @@
 
 (defun level-keys-down (key)
   (case sub-state
-    (top  (case key
+    (top (case key
 	    (:scancode-return (setf state 'paused))
 	    (:scancode-e (setf state 'equip))
 	    (:scancode-i (setf state 'inventory))
@@ -209,11 +209,11 @@
 			  (setf selection 0)
 			  (reset-text-buffer inventory-buffer))))
       (:scancode-e (if (eq sub-state 'item-information)
-		       (if (eq inventory-state armor)
-			   ;;;;equip armor onto the player
+		       (if (eq inventory-state 'armor)
+			   (print "equipped armor!");;;;equip armor onto the player
 			   )
-		       (if (eq inventory-state weapons)
-			   ;;;equip weapon onto player
+		       (if (eq inventory-state 'weapons)
+			   (print "equipped weapon!")   ;;;equip weapon onto player
 			   )))
       (:scancode-x (if (not (eq sub-state 'top))
 		       (progn (setf sub-state old-sub-state)
