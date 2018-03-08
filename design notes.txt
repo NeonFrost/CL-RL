@@ -30,6 +30,7 @@
     -Z'ken - A bipedal flying creature with large leathery wings. A war creature of the Vir. "Z" (White)
     -M'gdn - A gigantic quadroped herbivore. It's leathery skin is stretched over incredibly dense bones. It is a highly territorial creature. It is carbon based. "M" (brown)
     -Six Tailed Firewalker - A six tailed creature, with a fireball at the end of each tail. It is a genetic experiment of the Vir. "S" (boss) (red)
+    -F'eg'dor - Hell Turtle -
 
 ########################################################Books##############################################################
 -Only available in the temple
