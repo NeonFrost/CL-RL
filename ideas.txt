@@ -3,8 +3,8 @@
 ################################################
 
 Smaller rouge-like first
-Consists of 3-5 'levels'
-10 floors/rooms each, 10th floor/room of each being the boss
+Consists of 4 'levels'
+5 floors/rooms each, 5th floor/room of each being the boss
 Sci-fi, takes place in Karakas/Enigma universe
 
 Levels

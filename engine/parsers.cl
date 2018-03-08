@@ -6,13 +6,13 @@
 	 )))
 
 (defmacro delimit-to (lower-limit upper-limit str &key (modifier 0))
-  `(if (and (eq (type-of ,lower-limit) 'standard-char)
-	    (eq (type-of ,upper-limit) 'standard-char))
+  `(if (and (character-p ,lower-limit) ;;(eq (type-of ,lower-limit) 'standard-char)
+	    (character-p ,upper-limt)) ;;(eq (type-of ,upper-limit) 'standard-char))
        (subseq ,str (+ (1+ (position ,lower-limit ,str)) ,modifier) (position ,upper-limit ,str))
-       (let ((dl (if (eq (type-of ,lower-limit) 'standard-char)
+       (let ((dl (if (character-p ,lower-limit) ;;(eq (type-of ,lower-limit) 'standard-char)
 		     ,lower-limit
 		     (aref ,lower-limit 0)))
-	     (ul (if (eq (type-of ,upper-limit) 'standard-char)
+	     (ul (if (character-p ,upper-limt) ;;(eq (type-of ,upper-limit) 'standard-char)
 		     ,upper-limit
 		     (aref ,upper-limit 0))))
 	 (subseq ,str (+ (1+ (position dl ,str)) ,modifier) (position ul ,str))
@@ -27,24 +27,21 @@
 	      ))
        vals)))
 
-(define-parser book '(read-line
-		      read
-		      read))
+(define-parser book-reader '(read-line
+			     read
+			     read))
 
 (defmacro define-book (book-name file)
-  `(let* ((vals (book ,file))
-	  (name (car vals))
-	  (contents (cadr vals))
-	  (xp (caddr vals)))
+  `(let* ((vals (book-reader ,file))
+	  (name (first vals))
+	  (contents (second vals))
+	  (xp (third vals)))
      (defvar ,book-name (make-book :name name
 				   :contents contents
 				   :xp xp))))
 
 ;;;;usage: (define-book Gfens-death "G'fens death.book")
 
-(define-parser creature '(read-line
-			  read
-			  read-line))
 (defun collect-spells (spells tmp-list)
   (if tmp-list
       (if (find #\; spells)
@@ -65,7 +62,7 @@
       (collect-spells (delimiter ";" spells) tmp-list)
       tmp-list)
   )
-      
+
 (defun collect-stats (stats tmp-list)
   (if tmp-list
       (if (find #\% (delimit-to " " ";" stats))
@@ -84,11 +81,15 @@
       tmp-list)
   )
 
+(define-parser creature-reader '(read-line
+				 read
+				 read-line))
+
 (defmacro define-creature (creature-name file)
-  `(let* ((vals (creature ,file))
-	  (name (car vals))
-	  (description (cadr vals))
-	  (stats (caddr vals)) ;;;;create a helper function like the lisp file parser does with structs
+  `(let* ((vals (creature-reader ,file))
+	  (name (first vals))
+	  (description (second vals))
+	  (stats (third vals))
 	  (tmp-list (collect-stats stats '()))
 	  (attack (nth 0 tmp-list))
 	  (defense (nth 1 tmp-list))
@@ -139,13 +140,75 @@
 	  (resistant (nth 3 vals))
 	  (weak (nth 4 vals))
 	  )
-     (defstruct (,class-name (:include entity (symbol "@")
+     (defstruct (,class-name (:include player-character
+				       (symbol "@")
 				       (elemental character-class)))
        (spells spell-list)
        (attributes attributes)
        (resistance resistant)
        (weakness weak))
      ))
+
+(define-parser item-reader '(read
+			     read
+			     read
+			     read
+			     read
+			     read
+			     read
+			     read
+			     read))
+
+(defmacro define-item (item-name file)
+  `(let ((vals (item-reader ,file)))
+     (defstruct (,item-name (:include item
+				      (name (first vals))
+				      (type (second vals))
+				      (target (third vals)) 
+				      (class (fourth vals))
+				      (restore (fifth vals))
+				      (cost (sixth vals))
+				      (weight (seventh vals))
+				      (information (eighth vals))
+				      (symbol (ninth vals))
+				      )))))
+
+(define-parser weapon-reader '(read
+			       read
+			       read
+			       read
+			       read
+			       read
+			       read
+			       read
+			       read))
+
+(defmacro define-weapon (weapon-name file)
+  `(let ((vals (weapon-reader ,file)))
+     (defweapon ,weapon-name (first vals)
+       (second vals) (third vals)
+       (fourth vals) (fifth vals)
+       (sixth vals) (seventh vals)
+       :symbol (eighth vals)
+       :information (ninth vals))))
+
+(define-parser armor-reader '(read
+			      read
+			      read
+			      read
+			      read
+			      read
+			      read
+			      read))
+
+(defmacro define-armor (armor-name file)
+  `(let ((vals (armor-reader ,file)))
+     (defarmor ,armor-name (first vals)
+       (second vals) (third vals)
+       (fourth vals) (fifth vals)
+       (sixth vals)
+       :symbol (seventh vals)
+       :information (eighth vals))))
 #|
 ".class" files like so
 
@@ -160,4 +223,4 @@ Weld; Torch; Arson
 A: +2; D: +5; M: -50%; S: -1
 Fire
 Water
-|#	  
+|#

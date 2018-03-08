@@ -1,4 +1,5 @@
 (defun title-loop ()
+  (render-title-screen)
   )
 
 (defun level-loop ()
@@ -8,13 +9,12 @@
       (render-level))
   (if moving
       (progn (entity-move player :direction moving) 
-#|	       (north (decf (cadr (assoc :y (entity-position player))) 1))
-	       (south (incf (cadr (assoc :y (entity-position player))) 1))
-	       (west (decf (cadr (assoc :x (entity-position player))) 1))
-	       (east (incf (cadr (assoc :x (entity-position player))) 1))
-	       )|#
 	     (setf moving nil)
 	     ))
+  )
+
+(defun equip-loop ()
+  (render-equip-screen)
   )
 
 (defun inventory-loop ()

@@ -6,7 +6,59 @@
 (defvar cursor-buffer nil)
 (defvar information-buffer nil)
 (defvar message-buffer nil)
+(defvar actions-buffer nil)
+(push player-buffer buffers)
+(push room-buffer buffers)
+(push enemy-buffer buffers)
+(push item-buffer buffers)
+(push status-buffer buffers)
+(push cursor-buffer buffers)
+(push information-buffer buffers)
+(push message-buffer buffers)
+(push actions-buffer buffers)
 
+(defun render-player-menu ()
+  (if (not actions-buffer)
+      (let ((current-possible-actions (case sub-state
+					(top "789
+4 6: move
+123
+a: attack
+d: defend
+i: inventory
+e: equip weapon
+E: equip armor
+l: look
+")
+				    ((or look target) "789
+4 6: move cursor
+123
+x: back
+")
+				    (attack "789
+4 6: attack
+123
+x: back
+")
+				    )))
+	(if (eq sub-state 'look)
+	    (setf current-possible-actions (concatenate 'string current-possible-actions
+"i: item information
+e: enemy information")))
+	(setf actions-buffer (create-text-buffer current-possible-actions
+						 0 0
+						 :width (* (car character-size) 16)
+						 :height (* (cadr character-size) 13)
+						 :to-texture t :string-case 'text)))
+      (tex-blit actions-buffer
+		:src (sdl2:make-rect 0 0
+				     (sdl2:texture-width actions-buffer)
+				     (sdl2:texture-height actions-buffer))
+		:dest (sdl2:make-rect (menu-x player-menu)
+				      (menu-y player-menu)
+				      (menu-width player-menu)
+				      (round (/ (menu-height player-menu) 4))))
+      ))
 (defun render-map (x y max-characters)
   (render-box (+ (menu-x map-menu) (/ (car character-size) 2))
 	      (+ (menu-y map-menu) (/ (cadr character-size) 2))
@@ -18,10 +70,10 @@
 				 y
 				 (* (car max-characters) (car character-size))
 				 (* (cadr max-characters) (cadr character-size)))
-	    :dest (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
-				  (+ (menu-y map-menu) (/ (cadr character-size) 2))
-				  (- (menu-width map-menu) (/ (car character-size) 2))
-				  (- (menu-height map-menu) (/ (cadr character-size) 2)))
+	    :dest (sdl2:make-rect (- (+ (menu-x map-menu) (/ (car character-size) 2)) 2)
+				  (- (+ (menu-y map-menu) (/ (cadr character-size) 2)) 2)
+				  (+ (- (menu-width map-menu) (/ (car character-size) 2)) 2)
+				  (+ (- (menu-height map-menu) (/ (cadr character-size) 2)) 2))
 	    ))
 
 (defun set-status-string ()
@@ -66,9 +118,11 @@
 			    (armor (nth selection (inventory-armor players-inventory)))
 			    (weapons (nth selection (inventory-weapons players-inventory)))))
 		    (info (item-information item))
-		    (name (item-name item)))
+		    (name (item-name item))
+		    (weight (write-to-string (item-weight item)))
+		    (options "Temporary placement. Will be structured like: u: use d: drop e: equip"))
 	       (if (not information-buffer)
-		   (setf information-buffer (create-text-buffer (start-string name "" info) 0 0
+		   (setf information-buffer (create-text-buffer (start-string name "" info "" weight "" "" "" options) 0 0
 								:width (menu-width information-menu)
 								:height (menu-height information-menu)
 								:to-texture t :string-case 'text)))
@@ -80,10 +134,10 @@
 					       (+ (menu-y information-menu) (/ (cadr character-size) 2))
 					       (- (menu-width information-menu) (/ (car character-size) 2))
 					       (- (menu-height information-menu) (/ (cadr character-size) 2)))))
-			  (tex-blit information-buffer
-				    :src src
-				    :dest dest)
-			     ))
+		     (tex-blit information-buffer
+			       :src src
+			       :dest dest)
+		     ))
 	       )
 	     )))
 
@@ -118,7 +172,7 @@
 (defun render-message ()
   (tex-blit message-buffer
 	    :src (sdl2:make-rect 0 0 (sdl2:texture-width message-buffer) (sdl2:texture-height message-buffer))
-	    :dest (sdl2:make-rect (menu-x message-menu)
+	    :dest (sdl2:make-rect (+ (menu-x message-menu) 2)
 				  (menu-y message-menu)
 				  (menu-width message-menu)
 				  (menu-height message-menu))
@@ -128,6 +182,7 @@
 (defun render-level () 
   "This is temporary"
   (room-screen)
+  (render-player-menu)
   (render-stats)
   (if message-buffer
       (render-message))
@@ -173,7 +228,10 @@
 	     do (loop for x from 0 to (1- (cadr (array-dimensions enemy-array)))
 		   do (if (eq (aref enemy-array y x) 0)
 			  (setf str (concatenate 'string str (write-to-string (aref enemy-array y x))))
-			  (setf str (concatenate 'string str (entity-symbol (aref enemy-array y x))))
+			  (if (> (entity-hp (aref enemy-array y x)) 0)
+			      (setf str (concatenate 'string str (entity-symbol (aref enemy-array y x))))
+			      (progn (setf (aref enemy-array y x) 0)
+				     (setf str (concatenate 'string str (write-to-string (aref enemy-array y x))))))
 			  ))
 	       (setf str (with-output-to-string (stream)
 			   (write-string str stream)
@@ -205,29 +263,25 @@
 		     ))))
       (render-map x y max-characters)
       (tex-blit item-buffer
-		#|(sdl2:render-copy renderer
-		item-buffer|#
 		:src (sdl2:make-rect x
-					     y
-					     (* (car max-characters) (car character-size))
-					     (* (cadr max-characters) (cadr character-size))
-					     )				    
+				     y
+				     (* (car max-characters) (car character-size))
+				     (* (cadr max-characters) (cadr character-size))
+				     )				    
 		:dest (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
-					   (+ (menu-y map-menu) (/ (cadr character-size) 2))
-					   (- (menu-width map-menu) (/ (car character-size) 2))
-					   (- (menu-height map-menu) (/ (cadr character-size) 2)))
+				      (+ (menu-y map-menu) (/ (cadr character-size) 2))
+				      (- (menu-width map-menu) (/ (car character-size) 2))
+				      (- (menu-height map-menu) (/ (cadr character-size) 2)))
 		)
       (tex-blit enemy-buffer
-#|		(sdl2:render-copy renderer
-			enemy-buffer|#
 		:src (sdl2:make-rect x
-					     y
-					     (* (car max-characters) (car character-size))
-					     (* (cadr max-characters) (cadr character-size)))				    
+				     y
+				     (* (car max-characters) (car character-size))
+				     (* (cadr max-characters) (cadr character-size)))				    
 		:dest (sdl2:make-rect (+ (menu-x map-menu) (/ (car character-size) 2))
-					   (+ (menu-y map-menu) (/ (cadr character-size) 2))
-					   (- (menu-width map-menu) (/ (car character-size) 2))
-					   (- (menu-height map-menu) (/ (cadr character-size) 2)))
+				      (+ (menu-y map-menu) (/ (cadr character-size) 2))
+				      (- (menu-width map-menu) (/ (car character-size) 2))
+				      (- (menu-height map-menu) (/ (cadr character-size) 2)))
 		)
       )
     (let ((x (if (< (cadr (assoc :x (entity-position player))) (/ (car max-characters) 2))
@@ -277,10 +331,10 @@
        :dest (sdl2:make-rect (+ x (round (/ x-offset 4)))
 						   ;;;;(+ (- (+ x (round (/ x-offset 2))) (round (/ x-offset 4)) 4) (round (/ (car character-size) 4)))
 ;;;;						   (+ (- (+ y (round (/ y-offset 2))) (round (/ y-offset 4)) 4) (round (/ (cadr character-size) 4)))
-				  (+ y (round (/ y-offset 5)))
-				  x-offset
-				  (1+ y-offset)
-				  )
+			     (+ y (round (/ y-offset 5)))
+			     x-offset
+			     (1+ y-offset)
+			     )
        )
       (if (or (eq sub-state 'look)
 	      (eq sub-state 'target))

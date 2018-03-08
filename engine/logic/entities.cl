@@ -68,7 +68,7 @@ File for the 'entity' structures
 (defvar player (make-player-character :position '((:x 35) (:y 35)) :bg-color +navy-blue+ :symbol-color +yellow-zinc+))
 (setf (cursor-x cursor) (cadr (assoc :x (entity-position player)))
       (cursor-y cursor) (cadr (assoc :y (entity-position player))))
-(defweapon carbonium-axe "Carbon-Cobalt Alloy Axe" :axe 30 -5 5 400 :information "An axe made from an alloy of carbon and cobalt. It's edge is durable and sharp enough to cut through even the densest of diamonds. It is used both in the battlefield and for cutting gems.")
+(defweapon carbonium-axe "Carbon-Cobalt Alloy Axe" :axe 30 -5 5 400 5 :information "An axe made from an alloy of carbon and cobalt. It's edge is durable and sharp enough to cut through even the densest of diamonds. It is used both in the battlefield and for cutting gems.")
 (setf (entity-weapon player) (make-carbonium-axe))
 
 

@@ -1,11 +1,10 @@
 Building simulator like DF, but in Space
 Will use a tile sheet instead of pure ASCII (i.e. .png instead of a byte)
-Planned features (will probably take as long as DF):
+Planned features (will probably take as long as, if not longer than, DF):
 GENERATION:
 Galaxy : Sectors : Solar : Region : Local
-Life seeds : Civilization advancement (Communal -> slave -> feudal -> capitalist -> Socialist)
-Build Stations : Trade with galactic civs : Mine planets for resources : 
-
+Life seeds : Civilization advancement (Communal -> Slave -> Feudal -> Capitalist -> Socialist)
+Build Stations : Trade with galactic civs : Mine planets for resources : Exploration mode 
 
 Galactic Map:
 # = A sector
@@ -48,17 +47,18 @@ SS..Q...Q......S...S....S......
 .S.Q...Q.Q...E....S...S........
 ....S.S.......S........E.......
 ......................EEE......
+...............................
 
 Solar Map:
 r = red dwarf
 R = Red star
 b
 B
-p = planetoid (may not even have an atmosphere
+p = planetoid (may not even have an atmosphere)
 P = Planet
 G = Gas Giant
 A = Asteroid
-S = Station (if any)
+S = Station
 M = Mining station
  -------------------------------
 |...............................|
@@ -105,9 +105,6 @@ S = color code: White - Station
 s = Small ship (fighter, single person transport, etc.)		
 M = Mining Facility
 P = Planet
-D = Docking (slightly darker than white)
-e = engine
-w = weapon
  ----------------------------------
 |...PPPPPPP........................|
 |...PPPPPPP........................|
@@ -136,6 +133,11 @@ w = weapon
 
 
 Local Map:
+
+D = Docking (slightly darker than white)
+e = engine
+w = weapon
+
 
  --------------------------------------------------------------------------------------------
 |PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPA...........................................................|
@@ -180,3 +182,5 @@ Planetary map:
 Layers:
 Atmosphere - 
 Stratosphere
+
+Station Map:

@@ -28,19 +28,17 @@ A rather...unique item.")
 
 (define-screen inventory-screen inventory-menus)
 
-;;;;goes to item-information substate
-
 (defun render-inventory ()
   (inventory-screen)
-  (render-box 8 (+ (* selection (cadr character-size)) 8) (- (menu-width inventory-menu-items) 16) (cadr character-size) :color +natural-green+)
+  (render-box 8 (+ (* selection (cadr character-size)) 8) (- (menu-width inventory-menu-items) 8) (cadr character-size) :color +dark-natural-green+)
   (let ((inventory (case inventory-state
 		     (items (inventory-items players-inventory))
 		     (armor (inventory-armor players-inventory))
 		     (weapons (inventory-weapons players-inventory)))))
     (let ((*string-color* (case inventory-state
 			    (items +yellow-zinc+)
-			    (armor +cobalt+);;;;+light-blue+)
-			    (weapons +purple-jade+))));;;;+light-red+))))
+			    (armor +cobalt+)
+			    (weapons +purple-jade+))))
       (if (not inventory-buffer)
 	  (let ((str ""))
 	    (loop for item in inventory
@@ -54,10 +52,5 @@ A rather...unique item.")
 						       :width (menu-width inventory-menu-items)
 						       :height (menu-height inventory-menu-items)
 						       :to-texture t
-						       :string-case 'text))
-	    ))
-#|		      for y below (length (inventory-items players-inventory))
-		      do (render-string (item-name item) 8 (* y 8) :*string-color* +chalk-white+ :to-texture t))|#
-      (render-buffer inventory-buffer inventory-menu-items :color *string-color*)
-      ))
-  )
+						       :string-case 'text))))
+      (render-buffer inventory-buffer inventory-menu-items :color *string-color*))))

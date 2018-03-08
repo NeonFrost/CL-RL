@@ -67,7 +67,7 @@ int music_internal_position(double position)
   )
 
 (defun change-level-track (music)
-  "Stops 'level-track' and changes it to another track. Used upon exit/entrance of a level."
+  "Stops 'level-track' and changes it to another track. Used upon exit/entrance of a level/area."
   (sdl2-mixer:halt-music)
   (sdl2-mixer:free-music (track-stream level-track))
   (start-level-music music)
@@ -75,17 +75,17 @@ int music_internal_position(double position)
 
 (defun test-music ()
   (case volume-state
-    (increasing (if (< +track-volume+ 128)
-		    (progn (incf +track-volume+ 1)
+    (increasing (if (< +track-volume+ 125)
+		    (progn (incf +track-volume+ 5)
 			   (sdl2-mixer:volume-music +track-volume+))
 		    (setf volume-state nil)))
       
     (decreasing (if (> +track-volume+ 0)
-		    (progn (decf +track-volume+ 1)
+		    (progn (decf +track-volume+ 5)
 			   (sdl2-mixer:volume-music +track-volume+))
 		    (setf volume-state nil)))
     (track-changing (if (> +track-volume+ 0)
-			(progn (decf +track-volume+ 1)
+			(progn (decf +track-volume+ 5)
 			       (sdl2-mixer:volume-music +track-volume+))
 			(progn (setf volume-state nil)
 			       (change-level-track (level-music (player-level user))))))

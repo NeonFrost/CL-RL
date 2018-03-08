@@ -12,8 +12,8 @@
 (defmacro define-item-action (action-name doc &body body)
   `(defun ,action-name (item)
      ,doc
-     (let ((x (cadr (assoc :x (entity-position player))))
-	   (y (cadr (assoc :y (entity-postiion player))))
+     (let ((x (entity-x player));;(cadr (assoc :x (entity-position player))))
+	   (y (entity-y player));;(cadr (assoc :y (entity-postiion player))))
 	   (ends-turn t))
        (if (player-character-p entity)
 	   (reset-messages))

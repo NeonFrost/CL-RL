@@ -1,3 +1,6 @@
+Argument with self:
+Do stuff like outlined below or do JSON files? Or combo of below and JSON for saves?
+
 Engine note:
 Files ending with ".{def}" must be read in a certain way
 Files with ".creature" must be organized like so
@@ -11,7 +14,7 @@ Socra
 "A small odd creature. It has pincers and can spit acid. A creature of the Vir."
 A: 5; D: 2; R: 5; MA: 1; MD: 3; S: 5; DG: 5%; HP: 12; MP: 3; XP: 30; L: 5; E: Vir; SYM: S; LOS: 5
 
-".class" files like so
+".class"
 
 NAME
 ABILITIES
@@ -26,7 +29,7 @@ A: +2; D: +5; M: -50%; S: -1
 Fire
 Water
 
-".dead"
+".dead" - generated on player's death
 
 NAME
 LEVEL
@@ -88,6 +91,28 @@ ex:
 "An axe made of a carbon alloy."
 20
 
+".armor"
+
+NAME
+ATTACK
+DEFENSE
+AGILITY
+COST
+CLASS
+INFORMATION
+SYMBOL
+
+ex:
+"Anti-gravity Breastplate"
+1
+10
+1
+1000000
+:light-armor
+"A breastplate made of materials that reverses localized gravitational forces so as to reduce if not negate any possible damage to the wearer. Due to the materials used, it's weight is negligable on planet surfaces, however is completely useless in low-gravity situations."
+[
+
+
 ".book"
 
 NAME
@@ -97,7 +122,7 @@ XP-GIVEN
 Example:
 The Massacre of Vk'nef
 "When G'fen's punishment began, it was believed that the Vikshnar were involved in the creation and spread of the disease. 
-The Third Way of G'fen proceeded, on the mere basis of rumor, to attack the Vikshnar colony of Vk'nef.
+The Third Theory of G'fen proceeded, on the mere basis of rumor, to attack the Vikshnar colony of Vk'nef.
 Upon discovery that these G'fen extremists were going to do this, the only thing the council could do was send a messenger to the Vikshnar homeworld.
 Our military arrived at Vk'nef half way through the massacre. Unfortunately, millions more died before the last of the murderers either fled or died.
 Many Vikshnars were killed that day, and many more were radicalized. Many Gekrian fear that the Vikshnar will initiate a military campaign against us.
