@@ -2,15 +2,22 @@
   (render-title-screen)
   )
 
+(defun start-screen-loop ()
+  (render-start-screen)
+  (if (not room-buffer)
+      (stage-room-buffer)))
+
 (defun level-loop ()
   (if (or (eq sub-state 'enemy-information)
 	  (eq sub-state 'item-information))
       (render-information)
       (render-level))
+  (if start-screen-buffer
+      (progn (remove start-screen-buffer buffers)
+	     (reset-text-buffer start-screen-buffer)))
   (if moving
       (progn (entity-move player :direction moving) 
-	     (setf moving nil)
-	     ))
+	     (setf moving nil)))
   )
 
 (defun equip-loop ()

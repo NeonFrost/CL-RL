@@ -5,7 +5,7 @@
   height)
 (defmacro define-menu (name screen-menus x y w h border-color fill-color)
   `(progn (push (quote ,name) ,screen-menus)
-	  (defvar ,name (make-menu :x ,x :y ,y :width (- ,w 8) :height (- ,h 8)))
+	  (defvar ,name (make-menu :x (+ ,x 4) :y (+ ,y 4) :width (- ,w 8) :height (- ,h 8)))
 	  (defun ,name ()
 	    (let ((rect1 (sdl2:make-rect ,x ,y ,w ,h))
 		  (rect2 (sdl2:make-rect (+ ,x 4) (+ ,y 4) (- ,w 8) (- ,h 8))))

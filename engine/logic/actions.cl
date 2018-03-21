@@ -1,7 +1,15 @@
 (defvar weapon-strings '((:sword "slash")
 			 (:hammer "bash")
 			 (:axe "hack")
+			 (:knife "stab")
 			 (:gun "fire")
+			 (:spit "spits")
+			 (:claws "swipes")
+			 (:teeth "bites")
+			 (:talons "slashes")
+			 (:drill "drills")
+			 (:tusks "heaves")
+			 (:horns "rams")
 			 ))
 
 (defmacro define-command (command-name doc &body body)
@@ -18,8 +26,7 @@
        (if (player-character-p entity)
 	   (reset-messages))
        ,@body
-     ;;;;(if ends-turn
-     ;;;;    (end-turn))
+       (if ends-turn (end-turn))
        )))
 
 (defmacro define-action (action-name doc &body body)
@@ -36,8 +43,7 @@
 	   (create-message))
        (if (not (player-character-p entity))
 	   (reset-text-buffer enemy-buffer))
-       (if ends-turn
-	   (end-turn))
+       (if ends-turn (end-turn))
        )))
 
 (defmacro define-map-action (action-name doc &body body)
@@ -64,41 +70,39 @@
       (setf (entity-defense-mod entity) 0))
   (setf (entity-current-action entity) 'attack)
   (flet ((attack-message (action-name weapon-name direction) (push-message (concatenate 'string
-											"You " action-name
-											" your " weapon-name
-											" to the " direction ".")))
-	 )
+											(if (player-character-p entity)
+											    "You "
+											    (concatenate 'string "The " (entity-name entity) " "))
+											action-name
+											(if (player-character-p entity)
+											    " your "
+											    " its ")
+											weapon-name
+											" to the " direction "."))))
     (if (not (or (eq dir 5) (eq dir 'p) (eq dir 'player)))
-	(progn (attack-message (cadr (assoc (item-class (entity-weapon player)) weapon-strings))
-			       (item-name (entity-weapon player))
+	(progn (attack-message (if (player-character-p entity)
+				   (cadr (assoc (item-class (entity-weapon entity)) weapon-strings))
+				   (cadr (assoc (entity-weapon entity) weapon-strings)))
+			       (if (player-character-p entity)
+				   (item-name (entity-weapon entity))
+				   (write-to-string (entity-weapon entity)))
 			       (write-to-string dir))
-	       (test-attack player :target-point (list (+ (car (cadr (assoc dir direction-list))) x)
-						       (+ (cadr (cadr (assoc dir direction-list))) y)))
+	       (if (test-attack player :target-point (list (+ (car (cadr (assoc dir direction-list))) x)
+							   (+ (cadr (cadr (assoc dir direction-list))) y)))
+		   (setf ends-turn t))
+	       (setf ends-turn t)
 	       )
-	(push-message "Why attack yourself?")
-	)
-    #|    (case dir
-    ((or 1 sw south-west))
-    ((or 2 s south) ())
-    ((or 3 se south-east) ())
-
-    ((or 4 w west) ())
-    ((or 5 p player) (create-message "Why attack yourself?"))
-    ((or 6 e east) ()) ;;;;(+ x 1)
-
-    ((or 7 nw north-west) ())
-    ((or 8 n north) ())
-    ((or 9 ne north-east) ())
-    ;;;;push (monster at x/y +/- 1 depending on dir)
-    )|#
-    ))
+	(progn (setf ends-turn nil)
+	       (if (eq (car current-turn) 'p)
+		   (push-message "Why attack yourself?")))
+	)))
 
 (define-action fire-projectile
     "Entity fires weapon in a direction"
   (let ((can-fire nil))
     (if (player-character-p entity)
 	(if (not (player-character-ranged-weapon entity))
-	    (progn (push-message "You do not have a weapon equipped")
+	    (progn (push-message "You do not have a ranged weapon equipped.")
 		   (setf ends-turn nil))
 	    (setf can-fire t)
 	    )
@@ -123,7 +127,9 @@
 
 (define-action jump
     "Entity jumps in dir, affected by agility (speed, dodge, etc.)"
-  (setf (entity-current-action entity) 'jump)
+  (setf ends-turn nil)
+  ;;(setf (entity-current-action entity) 'jump)
+  (push-message "You jump in the air...to no avail. You're not superman after all!")
   )
 
 (define-item-action use
@@ -133,9 +139,12 @@
     (:food (push-message (concatenate 'string "You eat the " (item-name item) "."))
 	   (subtract-item item))
     ((:potion :vial) ())
-    (:weapon (push-message "You cannot //use// a weapon, however you can (e)quip it."))
-    (:armor (push-message "You cannot //use// armor, however you can (e)quip it."))
-    (otherwise (push-message "Why are you trying to use that?"))
+    (:weapon (setf ends-turn nil)
+	     (push-message "You cannot //use// a weapon, however you can (e)quip it."))
+    (:armor (setf ends-turn nil)
+	    (push-message "You cannot //use// armor, however you can (E)quip it."))
+    (otherwise (setf ends-turn nil)
+	       (push-message "Why are you trying to use that?"))
     ))
 
 (define-map-action grab-item
@@ -144,14 +153,12 @@
     if there is an item at the players feet and if the item can be picked up (including weight), then it is put into the players inventory"
   (let* ((x (entity-x player))
 	 (y (entity-y player))
-	 (tile (aref map y x))
+	 (tile (aref item-array y x))
 	 )
     (if (assoc tile items)
-	(let ((item (cadr (assoc tile items)))
-	      )
+	(let ((item (cadr (assoc tile items))))
 	  (if (< (+ (item-weight item) (iventory-weight (player-inventory player))) (inventory-max-weight (player-inventory player)))
 	      (progn (add-item item)
-		     (setf (aref map y x) "."))
-	      (push-message "You are carrying too much weight, you cannot add the item to your inventory.")
-	      ))))
-  )
+		     (setf (aref item-array y x) 0))
+	      (push-message "You are carrying too much weight, putting the item into your bag will create a temporary temporal shift at local coordinates with forces so strong that it would collapse local space.")
+	      )))))

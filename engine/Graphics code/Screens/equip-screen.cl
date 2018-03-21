@@ -26,14 +26,14 @@
     (if (not equipment-title-buffer)
 	(setf equipment-title-buffer (create-text-buffer name 0 0
 							 :width (* (length name) (car character-size))
-							 :height (menu-height equipment-title) :to-texture t :string-case 'text)))
+							 :height (cadr character-size) #|(menu-height equipment-title)|# :to-texture t :string-case 'text)))
     (tex-blit equipment-title-buffer
 	      :src (sdl2:make-rect 0 0
 				   (sdl2:texture-width equipment-title-buffer)
 				   (sdl2:texture-height equipment-title-buffer))
-	      :dest (sdl2:make-rect (round (- (/ *screen-width* 2) (/ (length name) 2)))
+	      :dest (sdl2:make-rect (- (round (- (/ *screen-width* 2) (/ (length name) 2))) 20)
 				    (menu-y equipment-title)
-				    (sdl2:texture-width equipment-title-buffer)
+				    (+ (sdl2:texture-width equipment-title-buffer) 40)
 				    (menu-height equipment-title))))
   (let ((inventory (case equip-state
 		     (armor (inventory-armor players-inventory))

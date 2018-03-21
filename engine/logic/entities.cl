@@ -20,11 +20,11 @@ File for the 'entity' structures
   (magic-attack-mod 0)
   (magic-defense 10)
   (magic-defense-mod 0)
-  (agility 1)
+  (agility 1) ;;;;Higher goes first, lower goes last
   (agility-mod 0)
   (speed 1) ;;;;in Rogue-like engines, this will be how many spaces an entity can move
   (speed-mod 0)
-  (dodge 0)
+  (dodge 1)
   (dodge-mod 0)
   (hp 40)
   (max-hp 40)
@@ -37,7 +37,7 @@ File for the 'entity' structures
   extra-effect ;;;;i.e.
   current-action
   (symbol "E")
-  (line-of-sight 10) ;meaning, it can see x amount of tiles away
+  (line-of-sight 10) ;meaning, it can see or ''see'' x amount of tiles away
   (position '((:x 0)
 	      (:y 0)))
   weapon
@@ -73,4 +73,4 @@ File for the 'entity' structures
 
 
 (defvar enemy (make-entity :position '((:x 40) (:y 31)) :bg-color +chalk-white+ :symbol-color +navy-blue+))
-(defstruct (socra (:include creature (name "Socra") (symbol "S") (weapon 'spit) (information "A fucking pile of slime"))))
+(defstruct (socra (:include creature (name "Socra") (symbol "S") (weapon :spit) (information "A fucking pile of slime"))))

@@ -13,8 +13,8 @@
 
 (defun main-menu-keys-down (key)
   (case key
-    (:scancode-up (change-selection 0))
-    (:scancode-down (change-selection 1))
+;;   (:scancode-up (change-selection 0))
+;;   (:scancode-down (change-selection 1))
     )
   )
 
@@ -22,6 +22,19 @@
   (case key
     (:scancode-return (confirm-selection))
     (:scancode-escape (quit-game))
+    (:scancode-z (setf state 'start-screen))
+    )
+  )
+
+(defun start-screen-keys-down (key)
+  (case key
+;;   (:scancode-up (change-selection 0))
+;;   (:scancode-down (change-selection 1))
+    )
+  )
+
+(defun start-screen-keys-up (key)
+  (case key
     (:scancode-z (setf state 'level))
     )
   )
@@ -238,6 +251,7 @@
     (inventory (inventory-keys-down key))
     (level (level-keys-down key))
     (game-over (game-over-keys-down key))
+    (start-screen (start-screen-keys-down key))
     )
   )
 
@@ -254,6 +268,7 @@
     (inventory (inventory-keys-up key))
     (level (level-keys-up key))
     (game-over (game-over-keys-down key))
+    (start-screen (start-screen-keys-up key))
     )
   )
 

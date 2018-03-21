@@ -30,7 +30,7 @@ A rather...unique item.")
 
 (defun render-inventory ()
   (inventory-screen)
-  (render-box 8 (+ (* selection (cadr character-size)) 8) (- (menu-width inventory-menu-items) 8) (cadr character-size) :color +dark-natural-green+)
+  (render-box (menu-x inventory-menu-items) (+ (* selection (cadr character-size)) (round (/ (cadr character-size) 2)) (menu-y inventory-menu-items)) (- (menu-width inventory-menu-items) 8) (cadr character-size) :color +dark-natural-green+)
   (let ((inventory (case inventory-state
 		     (items (inventory-items players-inventory))
 		     (armor (inventory-armor players-inventory))

@@ -53,6 +53,7 @@ starting sequence
 	  (:quit ()
 		 (quit-audio)
 		 (kill-textures)
+		 (sdl2:destroy-renderer renderer)
 		 t)
 	  )))))
 
@@ -66,9 +67,10 @@ starting sequence
     (inventory (inventory-loop))
     (credits (credits-loop))
     (game-over (game-over-loop))
+    (start-screen (start-screen-loop))
     ))
 
-(defun kill-textures () ;;start pushing buffer names to a variable and loop through that variable on close
+(defun kill-textures ()
   (loop for buffer in buffers
      do (if buffer
 	    (sdl2:destroy-texture buffer)))
